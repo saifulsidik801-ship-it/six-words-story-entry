@@ -13,18 +13,17 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-type Candidate = {
-  text: string;
-  // Scores 0-10 per judge criterion, in the brief's order of importance.
-  complete: number; // tells a whole story in exactly six words
-  turn: number; // lands a turn, a surprise, a whole life implied
-  economy: number; // every word earns its place, no filler
-  rhythm: number; // reads cleanly aloud, no clumsy phrasing
-  unsaid: number; // leaves something for the reader to fill in
-  note: string;
-};
+// Candidate shape (plain object, no TS-only syntax, so the file also runs
+// as plain JavaScript under any Node with or without type stripping):
+// { text, complete, turn, economy, rhythm, unsaid, note }
+// Scores are 0-10 per judge criterion, in the brief's order of importance:
+// complete = tells a whole story in exactly six words;
+// turn = lands a turn, a surprise, a whole life implied;
+// economy = every word earns its place, no filler;
+// rhythm = reads cleanly aloud, no clumsy phrasing;
+// unsaid = leaves something for the reader to fill in.
 
-const CANDIDATES: Candidate[] = [
+const CANDIDATES = [
   {
     text: "His lunchbox came home. He didn't.",
     complete: 10,
@@ -166,11 +165,11 @@ const CANDIDATES: Candidate[] = [
 // weights fall steeply: completeness decides, then the turn, and so on.
 const WEIGHTS = { complete: 5, turn: 4, economy: 3, rhythm: 2, unsaid: 1 };
 
-function wordCount(text: string): number {
+function wordCount(text) {
   return text.split(/\s+/).filter(Boolean).length;
 }
 
-function score(c: Candidate): number {
+function score(c) {
   return (
     c.complete * WEIGHTS.complete +
     c.turn * WEIGHTS.turn +
@@ -180,7 +179,7 @@ function score(c: Candidate): number {
   );
 }
 
-function main(): void {
+function main() {
   // Every candidate must be exactly six words — the gate's first test.
   for (const c of CANDIDATES) {
     if (wordCount(c.text) !== 6) {
